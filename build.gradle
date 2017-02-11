@@ -1,0 +1,30 @@
+apply plugin: 'base'
+
+version = externalVersion
+
+def imageName = rootProject.name + ':' + version
+def localImageTag = 'local/' + imageName
+def registryImageTag = deployRepoUrl + '/' + imageName
+
+task buildImage(type: Exec) {
+    description 'Builds the Docker image.'
+    group 'build'
+    def resources = file(projectDir.absolutePath + File.separator + 'resources')
+    workingDir resources.absolutePath
+    commandLine 'docker', 'build', '-t', localImageTag, resources.absolutePath
+}
+
+task tagLocalImage(type: Exec) {
+    mustRunAfter 'buildImage'
+    description 'Tags the image.'
+    group 'publish'
+    commandLine 'docker', 'tag', localImageTag, registryImageTag
+}
+
+task pushImage(type: Exec) {
+    dependsOn 'buildImage', 'tagLocalImage'
+    mustRunAfter 'clean'
+    description 'Pushes the image to the Docker registry.'
+    group 'publish'
+    commandLine 'docker', 'push', registryImageTag
+}
