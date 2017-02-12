@@ -37,7 +37,9 @@ Applications > Network > Web Browsing > Google Chrome
 Some applications (such as Google Chrome) will not run under the root user. A
 non-root user named `apps` is included for such scenarios.
 
-## Environment variables
+## Additional settings
+The following settings can be specified at runtime using the `docker -e`
+argument:
 * `VNC_SERVER_PASSWORD`: Specifies the VNC server password. This is the password
 that will be needed when connecting to x11vnc using a VNC viewer. If this is
 not set, it defaults to no password.
@@ -66,8 +68,8 @@ script. If you do not want to use Gradle, you can also use the standard `docker
 ### Required dependencies
 The following dependencies are required to build the image:
 1. [Docker](https://docs.docker.com/engine/installation/)
-2. [Java(+)](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
-(+) Only required if you want to use Gradle to build the image*
+2. [Java](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
+    (+) Only required if you want to use Gradle to build the image
 
 ### Build command
 **Note**: In the future, additional operating systems may be supported. Please
