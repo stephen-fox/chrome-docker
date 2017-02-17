@@ -35,9 +35,21 @@ launch_xvfb() {
 }
 
 launch_window_manager() {
-    # Start fluxbox and wait 2 seconds for it to be fully up.
+    local timeout=${XVFB_TIMEOUT:-5}
+
+    # Start and wait for either fluxbox to be fully up or we hit the timeout.
     fluxbox &
-    sleep 2
+    local loopCount=0
+    until wmctrl -m > /dev/null 2>&1
+    do
+        loopCount=$((loopCount+1))
+        sleep 1
+        if [ ${loopCount} -gt ${timeout} ]
+        then
+            echo "${G_LOG_E} fluxbox failed to start."
+            exit 1
+        fi
+    done
 }
 
 run_vnc_server() {
@@ -45,8 +57,12 @@ run_vnc_server() {
 
     if [ -n "${VNC_SERVER_PASSWORD}" ]
     then
-        local passwordFilePath='/etc/x11vnc.pass'
-        x11vnc -storepasswd "${VNC_SERVER_PASSWORD}" "${passwordFilePath}"
+        local passwordFilePath="${HOME}/x11vnc.pass"
+        if ! x11vnc -storepasswd "${VNC_SERVER_PASSWORD}" "${passwordFilePath}"
+        then
+            echo "${G_LOG_E} Failed to store x11vnc password"
+            exit 1
+        fi
         passwordArgument=-"-rfbauth ${passwordFilePath}"
         echo "${G_LOG_I} The VNC server will ask for a password."
     else
