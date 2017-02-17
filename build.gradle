@@ -9,7 +9,7 @@ def registryImageTag = deployRepoUrl + '/' + imageName
 task buildImage(type: Exec) {
     description 'Builds the Docker image.'
     group 'build'
-    def resources = file(projectDir.absolutePath + File.separator + 'resources')
+    def resources = file(projectDir.absolutePath + File.separator + 'image')
     workingDir resources.absolutePath
     commandLine 'docker', 'build', '-t', localImageTag, resources.absolutePath
 }
