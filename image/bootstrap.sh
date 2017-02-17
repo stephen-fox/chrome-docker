@@ -60,7 +60,7 @@ run_vnc_server() {
         local passwordFilePath="${HOME}/x11vnc.pass"
         if ! x11vnc -storepasswd "${VNC_SERVER_PASSWORD}" "${passwordFilePath}"
         then
-            echo "${G_LOG_E} Failed to store x11vnc password"
+            echo "${G_LOG_E} Failed to store x11vnc password."
             exit 1
         fi
         passwordArgument=-"-rfbauth ${passwordFilePath}"
