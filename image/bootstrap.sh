@@ -2,17 +2,27 @@
 
 # Based on: http://www.richud.com/wiki/Ubuntu_Fluxbox_GUI_with_x11vnc_and_Xvfb
 
-readonly G_LOG_I='[INFO]'
-readonly G_LOG_W='[WARN]'
-readonly G_LOG_E='[ERROR]'
-
 main() {
+    log_i "Starting xvfb virtual display..."
     launch_xvfb
+    log_i "Starting window manager..."
     launch_window_manager
+    log_i "Starting VNC server..."
     run_vnc_server
 }
 
 launch_xvfb() {
+    local xvfbLockFilePath="/tmp/.X1-lock"
+    if [ -f "${xvfbLockFilePath}" ]
+    then
+        log_i "Removing xvfb lock file '${xvfbLockFilePath}'..."
+        if ! rm -v "${xvfbLockFilePath}"
+        then
+            log_e "Failed to remove xvfb lock file"
+            exit 1
+        fi
+    fi
+
     # Set defaults if the user did not specify envs.
     export DISPLAY=${XVFB_DISPLAY:-:1}
     local screen=${XVFB_SCREEN:-0}
@@ -28,7 +38,7 @@ launch_xvfb() {
         sleep 1
         if [ ${loopCount} -gt ${timeout} ]
         then
-            echo "${G_LOG_E} xvfb failed to start."
+            log_e "xvfb failed to start"
             exit 1
         fi
     done
@@ -46,7 +56,7 @@ launch_window_manager() {
         sleep 1
         if [ ${loopCount} -gt ${timeout} ]
         then
-            echo "${G_LOG_E} fluxbox failed to start."
+            log_e "fluxbox failed to start"
             exit 1
         fi
     done
@@ -60,17 +70,33 @@ run_vnc_server() {
         local passwordFilePath="${HOME}/.x11vnc.pass"
         if ! x11vnc -storepasswd "${VNC_SERVER_PASSWORD}" "${passwordFilePath}"
         then
-            echo "${G_LOG_E} Failed to store x11vnc password."
+            log_e "Failed to store x11vnc password"
             exit 1
         fi
         passwordArgument=-"-rfbauth ${passwordFilePath}"
-        echo "${G_LOG_I} The VNC server will ask for a password."
+        log_i "The VNC server will ask for a password"
     else
-        echo "${G_LOG_W} The VNC server will NOT ask for a password."
+        log_w "The VNC server will NOT ask for a password"
     fi
 
     x11vnc -display ${DISPLAY} -forever ${passwordArgument} &
     wait $!
+}
+
+log_i() {
+    log "[INFO] ${@}"
+}
+
+log_w() {
+    log "[WARN] ${@}"
+}
+
+log_e() {
+    log "[ERROR] ${@}"
+}
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${@}"
 }
 
 control_c() {
