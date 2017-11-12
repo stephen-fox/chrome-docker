@@ -12,6 +12,17 @@ main() {
 }
 
 launch_xvfb() {
+    local xvfbLockFilePath="/tmp/.X1-lock"
+    if [ -f "${xvfbLockFilePath}" ]
+    then
+        log_i "Removing xvfb lock file '${xvfbLockFilePath}'..."
+        if ! rm -v "${xvfbLockFilePath}"
+        then
+            log_e "Failed to remove xvfb lock file"
+            exit 1
+        fi
+    fi
+
     # Set defaults if the user did not specify envs.
     export DISPLAY=${XVFB_DISPLAY:-:1}
     local screen=${XVFB_SCREEN:-0}
