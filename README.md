@@ -1,6 +1,11 @@
-# Chrome Docker
-## What is it?
+# Chrome Docker (unmaintained)
 A Docker image that can run Google Chrome.
+
+Please note, this project is no longer maintained. I am currently focused on
+other projects, and do not have the required time to support this. Pease feel
+free to fork it.
+
+Thank you for using it. I hope that it helped :)
 
 ## How does it work?
 The Docker image includes a VNC server which provides graphical access to the
